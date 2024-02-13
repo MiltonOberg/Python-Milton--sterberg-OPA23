@@ -22,6 +22,6 @@ class Pichu:
 
 
 
-class Program:
-    pikachu = Pikachu(26, 30)
-    print(pikachu.height, pikachu.width)
+class Userinterface:
+    
+    
