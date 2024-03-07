@@ -1,27 +1,59 @@
 import matplotlib.pyplot as plt
 from pathlib import Path
 import pandas as pd
+from inspect import currentframe
 
-DATA_PATH= Path(__file__).parents[2]/ "Data"
+DATA_PATH = Path(__file__).parents[2]/ "Data"
+STYLES_PATH= Path(__file__).parent/ "Styles"
 
 class StoryCharts:
     def __init__(self) -> None:
-        pass
-        
-        
-    def _plot(self, x, y, colors= "#1400F4", ** label_kwargs):
-        self.fig, self.ax= plt.subplots()
-        
-    def Line(self, x, y):
-        pass
-#Check to run script as a stand-alone, main is the file name
+        plt.style.use(STYLES_PATH/ "base.mplstyle")
+
+    def _set_labels(self, title, xlabel, ylabel):
+        self.ax.set_xlabel(xlabel, loc="left")
+        self.ax.set_ylabel(ylabel, loc="top")
+        self.ax.set_title(title, loc="left", pad=15)
+
+    def _plot(self, x, y, colors="#1400F4", **label_kwargs):
+        self.fig, self.ax = plt.subplots()
+
+        calling_method_name = currentframe().f_back.f_code.co_name
+        if calling_method_name == "Line":
+            self.ax.plot(x, y, color=colors)
+        elif calling_method_name == "bar":
+            self.ax.bar(x, y, colors=colors, width= 1)
+
+        self._set_labels(**label_kwargs)
+        self.fig.tight_layout()
+        plt.show()
+
+    def Line(self, x, y, colors= "#1400F4", **label_kwargs):
+        self._plot(x, y, colors=colors, **label_kwargs)
+    def Bar(self, x, y, colors= "#1400F4", **label_kwargs):
+        self._plot(x, y, colors= colors, **label_kwargs)
+
+# Check to run script as a stand-alone, main is the file name
 if __name__ == "__main__":
     print("\n\n")
     print(DATA_PATH)
-    #print(__name__)
-    
-    df = pd.read_csv(DATA_PATH/ "co2_annmean_mlo.csv", skiprows= 43)
+    # print(__name__)
+
+    df = pd.read_csv(DATA_PATH / "Data_processing"/ "co2_annmean_mlo.csv", skiprows=43)
     print(df.head())
-    
-    sc= StoryCharts()
-    sc._plot(2, 3)
+
+    sc = StoryCharts()
+    """sc.Line(
+        df["year"],
+        df["mean"],
+        xlabel="YEARS FROM 1959",
+        ylabel="CO$_2$ MOLE FRACTION IN PPM",
+        title="The annual mean of CO$_2$ emissions measured in Mauna Lao has\nincreased every year since 1959",
+    )"""
+    sc.Bar(
+        df["year"],
+        df["mean"],
+        xlabel="YEARS FROM 1959",
+        ylabel="CO$_2$ MOLE FRACTION IN PPM",
+        title="The annual mean of CO$_2$ emissions measured in Mauna Lao has\nincreased every year since 1959"
+    )
